@@ -41,3 +41,22 @@ If you want to kick the tires, we would love feedback. Check out these two examp
 
 - [simple.go](https://github.com/GrantStreetGroup/go-slackbot/blob/master/examples/simple/simple.go)
 - [wit.go](https://github.com/GrantStreetGroup/go-slackbot/blob/master/examples/wit/wit.go).
+
+## Events API SocketMode support
+
+To enable SocketMode support over RTM use
+
+    bot := slackbot.New(token, ...options)
+    bot.EventMode = "Socket"
+
+
+
+
+## ReactionEvent
+
+Bot can respond to the use of reactions in a slack message stream.
+
+    bot.ReactTo("reaction").ReactionHandler(handlerfunc)
+
+
+    
