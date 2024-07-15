@@ -43,7 +43,6 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/sanity-io/litter"
 	"github.com/slack-go/slack"
 )
 
@@ -83,7 +82,6 @@ func (b *Bot) Run() {
 			ctx = AddBotToContext(ctx, b)
 			if b.Debug {
 				ctx = SetDebug(ctx)
-				litter.Dump(msg)
 			}
 			switch ev := msg.Data.(type) {
 			case *slack.ConnectedEvent:
