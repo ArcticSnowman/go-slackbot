@@ -102,6 +102,10 @@ func (b *Bot) Run() {
 					continue
 				}
 
+				// Ignore bot_messages
+				if ev.SubType == slack.MsgSubTypeBotMessage {
+					continue
+				}
 				ctx = AddMessageToContext(ctx, ev)
 				var match RouteMatch
 				if matched, ctx := b.Match(ctx, &match); matched {
