@@ -94,6 +94,10 @@ func (b *Bot) Run() {
 				if b.botUserID == ev.User {
 					continue
 				}
+				// ignore message_replies subtypes as we will get the full message event.
+				if ev.SubType == slack.MsgSubTypeMessageReplied {
+					continue
+				}
 
 				ctx = AddMessageToContext(ctx, ev)
 				var match RouteMatch
