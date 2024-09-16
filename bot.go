@@ -135,12 +135,25 @@ func (b *Bot) Run() {
 					match.Handler(ctx)
 				}
 
+			case *slack.ChannelJoinedEvent:
+				ctx = AddChannelJoinToContext(ctx, ev)
+
+				var match RouteMatch
+				if matched, ctx := b.Match(ctx, &match); matched {
+					match.Handler(ctx)
+				}
+			case *slack.ChannelLeftEvent:
+				ctx = AddChannelLeftToContext(ctx, ev)
+				var match RouteMatch
+				if matched, ctx := b.Match(ctx, &match); matched {
+					match.Handler(ctx)
+				}
+
 			case *slack.RTMError:
 				fmt.Printf("Error: %s\n", ev.Error())
 
 			case *slack.InvalidAuthEvent:
 				fmt.Printf("Invalid credentials")
-				break
 
 			default:
 				// Ignore other events..

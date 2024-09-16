@@ -63,6 +63,11 @@ func (r *Route) ReactTo(react string) *Route {
 	return r
 }
 
+func (r *Route) Channel() *Route {
+	r.err = r.addChannelMatcher()
+	return r
+}
+
 func (r *Route) Messages(types ...MessageType) *Route {
 	r.addTypesMatcher(types...)
 	return r
@@ -93,6 +98,20 @@ func (r *Route) ReactionHandler(fn ReactionHandler) *Route {
 			fn(ctx, bot, ReactionAddedFromContext(ctx), nil)
 		case "Removed":
 			fn(ctx, bot, nil, ReactionRemovedFromContext(ctx))
+		}
+	})
+
+}
+
+func (r *Route) ChannelHandler(fn ChannelHandler) *Route {
+
+	return r.Handler(func(ctx context.Context) {
+		bot := BotFromContext(ctx)
+		switch ChannelTypeFromContext(ctx) {
+		case "Joined":
+			fn(ctx, bot, ChannelJoinedFromContext(ctx), nil)
+		case "Left":
+			fn(ctx, bot, nil, ChannelLeftFromContext(ctx))
 		}
 	})
 
@@ -241,4 +260,42 @@ func (r *Route) addReactionMatcher(reaction string) error {
 
 	r.AddMatcher(&ReactionMatcher{reaction: reaction, botUserID: ""})
 	return nil
+}
+
+// ============================================================================
+// Channel Membership Matcher
+// ============================================================================
+
+type ChannelMatcher struct {
+	channel   string
+	botUserID string
+}
+
+func (cm ChannelMatcher) Match(ctx context.Context) (bool, context.Context) {
+	if IsDebug(ctx) {
+		log.Printf("DEBUG: %s", ChannelTypeFromContext(ctx))
+	}
+
+	switch ChannelTypeFromContext(ctx) {
+	case "Joined":
+		return true, ctx
+	case "Left":
+		return true, ctx
+	}
+
+	return false, ctx
+}
+
+func (cm ChannelMatcher) SetBotID(botID string) {
+	cm.botUserID = botID
+}
+func (r *Route) addChannelMatcher() error {
+
+	if r.err != nil {
+		return r.err
+	}
+
+	r.AddMatcher(&ChannelMatcher{})
+	return nil
+
 }

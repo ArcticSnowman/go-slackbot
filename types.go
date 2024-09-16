@@ -20,6 +20,7 @@ const (
 type Handler func(context.Context)
 type MessageHandler func(ctx context.Context, bot *Bot, msg *slack.MessageEvent)
 type ReactionHandler func(ctx context.Context, bot *Bot, added *slack.ReactionAddedEvent, removed *slack.ReactionRemovedEvent)
+type ChannelHandler func(ctx context.Context, bot *Bot, joined *slack.ChannelJoinedEvent, left *slack.ChannelLeftEvent)
 
 type Preprocessor func(context.Context) context.Context
 

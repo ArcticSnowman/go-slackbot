@@ -49,10 +49,17 @@ func (r *SimpleRouter) ReactTo(react string) *Route {
 	return r.NewRoute().ReactTo(react)
 }
 
+func (r *SimpleRouter) Channel() *Route {
+	return r.NewRoute().Channel()
+}
+
 func (r *SimpleRouter) Handler(handler Handler) *Route {
 	return r.NewRoute().Handler(handler)
 }
 
+func (r *SimpleRouter) ChannelHandler(handler ChannelHandler) *Route {
+	return r.NewRoute().ChannelHandler(handler)
+}
 func (r *SimpleRouter) ReactionHandler(handler ReactionHandler) *Route {
 	return r.NewRoute().ReactionHandler(handler)
 }

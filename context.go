@@ -11,6 +11,9 @@ const (
 	REACTION_CONTEXT = "__REACTION_CONTEXT__"
 	REACTION_EVENT   = "__REACTION_EVENT__"
 	BOT_DEBUG        = "__BOT_DEBUG__"
+	CHANNEL_CONTEXT  = "__CHANNEL_CONTEXT__"
+	CHANNEL_JOINED   = "__CHANNEL_JOINED__"
+	CHANNEL_LEFT     = "__CHANNEL_LEFT__"
 )
 
 func BotFromContext(ctx context.Context) *Bot {
@@ -64,6 +67,37 @@ func ReactionAddedFromContext(ctx context.Context) *slack.ReactionAddedEvent {
 
 func ReactionRemovedFromContext(ctx context.Context) *slack.ReactionRemovedEvent {
 	if result, ok := ctx.Value(REACTION_EVENT).(*slack.ReactionRemovedEvent); ok {
+		return result
+	}
+	return nil
+}
+
+func AddChannelJoinToContext(ctx context.Context, channel *slack.ChannelJoinedEvent) context.Context {
+	nctx := context.WithValue(ctx, CHANNEL_CONTEXT, "Joined")
+	return context.WithValue(nctx, CHANNEL_JOINED, channel)
+}
+
+func AddChannelLeftToContext(ctx context.Context, channel *slack.ChannelLeftEvent) context.Context {
+	nctx := context.WithValue(ctx, CHANNEL_CONTEXT, "Left")
+	return context.WithValue(nctx, CHANNEL_LEFT, channel)
+}
+
+func ChannelTypeFromContext(ctx context.Context) string {
+	if result, ok := ctx.Value(CHANNEL_CONTEXT).(string); ok {
+		return result
+	}
+	return ""
+
+}
+func ChannelJoinedFromContext(ctx context.Context) *slack.ChannelJoinedEvent {
+	if result, ok := ctx.Value(CHANNEL_JOINED).(*slack.ChannelJoinedEvent); ok {
+		return result
+	}
+	return nil
+}
+
+func ChannelLeftFromContext(ctx context.Context) *slack.ChannelLeftEvent {
+	if result, ok := ctx.Value(CHANNEL_LEFT).(*slack.ChannelLeftEvent); ok {
 		return result
 	}
 	return nil
