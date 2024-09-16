@@ -65,6 +65,8 @@ type Bot struct {
 	routes []*Route
 	// Slack UserID of the bot UserID
 	botUserID string
+	// Blacklist Chanels
+	blacklist []string
 	// Slack API
 	Client *slack.Client
 	RTM    *slack.RTM
@@ -106,6 +108,10 @@ func (b *Bot) Run() {
 				if ev.SubType == slack.MsgSubTypeBotMessage {
 					continue
 				}
+
+				if b.isChannelBlacklisted(ev.Channel) {
+					continue
+				}
 				ctx = AddMessageToContext(ctx, ev)
 				var match RouteMatch
 				if matched, ctx := b.Match(ctx, &match); matched {
@@ -117,6 +123,9 @@ func (b *Bot) Run() {
 				if b.botUserID == ev.User {
 					continue
 				}
+				if b.isChannelBlacklisted(ev.Item.Channel) {
+					continue
+				}
 
 				ctx = AddReactionAddedToContext(ctx, ev)
 				var match RouteMatch
@@ -126,6 +135,9 @@ func (b *Bot) Run() {
 			case *slack.ReactionRemovedEvent:
 				// Handle reaction events
 				if b.botUserID == ev.User {
+					continue
+				}
+				if b.isChannelBlacklisted(ev.Item.Channel) {
 					continue
 				}
 
@@ -199,6 +211,20 @@ func (b *Bot) BotUserID() string {
 
 func (b *Bot) setBotID(ID string) {
 	b.botUserID = ID
+}
+
+func (b *Bot) SetChannelBlacklist(blacklist []string) {
+	b.blacklist = append(b.blacklist, blacklist...)
+}
+
+func (b *Bot) isChannelBlacklisted(channel string) bool {
+	for _, blacklist := range b.blacklist {
+		if channel == blacklist {
+			return true
+		}
+	}
+	return false
+
 }
 
 // msgLen gets lenght of message and attachment messages. Unsupported types return 0.
