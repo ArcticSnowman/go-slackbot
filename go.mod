@@ -1,6 +1,6 @@
-module github.com/GrantStreetGroup/go-slackbot
+module github.com/ArcticSnowman/go-slackbot
 
-go 1.18
+go 1.23
 
 require (
 	github.com/chris-skud/go-wit v0.0.0-20160116012338-c5c44784af9f
