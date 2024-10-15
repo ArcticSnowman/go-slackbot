@@ -2,6 +2,7 @@ package slackbot
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/slack-go/slack"
@@ -12,7 +13,9 @@ import (
 
 func (b *Bot) RunSocketMode() {
 
-	b.Socket = socketmode.New(b.Client, socketmode.OptionDebug(b.Debug))
+	b.Socket = socketmode.New(b.Client,
+		socketmode.OptionDebug(b.Debug),
+		socketmode.OptionLog(log.New(os.Stdout, "socketmode: ", log.Lshortfile|log.LstdFlags)))
 
 	go func() {
 		for evt := range b.Socket.Events {
