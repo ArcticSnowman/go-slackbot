@@ -23,6 +23,7 @@ func (b *Bot) RunSocketMode() {
 			ctx = AddBotToContext(ctx, b)
 			if b.Debug {
 				ctx = SetDebug(ctx)
+				log.Printf("Event Type: %s", evt.Type)
 			}
 
 			switch evt.Type {
@@ -33,6 +34,8 @@ func (b *Bot) RunSocketMode() {
 				fmt.Println("Connection failed. Retrying later...")
 			case socketmode.EventTypeConnected:
 				fmt.Println("Connected to Slack with Socket Mode.")
+			case socketmode.EventTypeHello:
+				fmt.Println("Slack says hello")
 			case socketmode.EventTypeEventsAPI:
 				eventsAPIEvent, ok := evt.Data.(slackevents.EventsAPIEvent)
 				if !ok {
