@@ -44,6 +44,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/slack-go/slack"
+	"github.com/slack-go/slack/socketmode"
 )
 
 const (
@@ -56,6 +57,7 @@ const (
 // New constructs a new Bot using the slackToken to authorize against the Slack service.
 func New(slackToken string, options ...slack.Option) *Bot {
 	b := &Bot{Client: slack.New(slackToken, options...)}
+	b.EventMode = "RTM"
 	return b
 }
 
@@ -66,13 +68,25 @@ type Bot struct {
 	// Slack UserID of the bot UserID
 	botUserID string
 	// Slack API
-	Client *slack.Client
-	RTM    *slack.RTM
-	Debug  bool
+	Client    *slack.Client
+	RTM       *slack.RTM
+	Socket    *socketmode.Client
+	Debug     bool
+	EventMode string
 }
 
-// Run listens for incoming slack RTM events, matching them to an appropriate handler.
+// Run listeners for incoming slack events via RTM or Socketmode, matching them to an appropriate handler.
 func (b *Bot) Run() {
+
+	if b.EventMode == "RTM" {
+		b.RunRTM()
+	} else {
+		b.RunSocketMode()
+	}
+}
+
+// Run listeners for incoming slack RTM events, matching them to an appropriate handler.
+func (b *Bot) RunRTM() {
 	b.RTM = b.Client.NewRTM()
 	go b.RTM.ManageConnection()
 	for {
@@ -86,7 +100,7 @@ func (b *Bot) Run() {
 			switch ev := msg.Data.(type) {
 			case *slack.ConnectedEvent:
 				fmt.Printf("Connected: %#v\n", ev.Info.User)
-				b.setBotID(ev.Info.User.ID)
+				b.SetBotID(ev.Info.User.ID)
 			case *slack.MessageEvent:
 				// ignore messages from the current user, the bot user
 				if b.botUserID == ev.User {
@@ -152,10 +166,14 @@ func (b *Bot) Run() {
 
 // Reply replies to a message event with a simple message.
 func (b *Bot) Reply(evt *slack.MessageEvent, msg string, typing bool) {
-	if typing {
-		b.Type(evt, msg)
+	if b.EventMode == "RTM" {
+		if typing {
+			b.Type(evt, msg)
+		}
+		b.RTM.SendMessage(b.RTM.NewOutgoingMessage(msg, evt.Channel))
+	} else {
+		b.Client.PostMessage(evt.Channel, slack.MsgOptionText(msg, true), slack.MsgOptionAsUser(true))
 	}
-	b.RTM.SendMessage(b.RTM.NewOutgoingMessage(msg, evt.Channel))
 }
 
 // ReplyWithAttachments replys to a message event with a Slack Attachments message.
@@ -184,7 +202,7 @@ func (b *Bot) BotUserID() string {
 	return b.botUserID
 }
 
-func (b *Bot) setBotID(ID string) {
+func (b *Bot) SetBotID(ID string) {
 	b.botUserID = ID
 }
 
