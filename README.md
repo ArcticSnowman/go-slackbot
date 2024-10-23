@@ -44,11 +44,11 @@ If you want to kick the tires, we would love feedback. Check out these two examp
 
 ## Events API SocketMode support
 
-To enable SocketMode support over RTM use
+To enable SocketMode support over RTM you need an AppLevelToken for your bot app
 
-    bot := slackbot.New(token, ...options)
+    bot := slackbot.New(token, slack.OptionAppLevelToken(app), ...options)
     bot.EventMode = "Socket"
-
+	...
 
 
 

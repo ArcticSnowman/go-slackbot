@@ -191,6 +191,11 @@ func ConvertReactionAdded(evt *slackevents.ReactionAddedEvent) *slack.ReactionAd
 		ItemUser:       evt.ItemUser,
 		Reaction:       evt.Reaction,
 		EventTimestamp: evt.EventTimestamp,
+		Item: slack.ReactionItem{
+			Type:      evt.Item.Type,
+			Channel:   evt.Item.Channel,
+			Timestamp: evt.Item.Timestamp,
+		},
 	}
 
 	return &react
@@ -204,6 +209,11 @@ func ConvertReactionRemoved(evt *slackevents.ReactionRemovedEvent) *slack.Reacti
 		ItemUser:       evt.ItemUser,
 		Reaction:       evt.Reaction,
 		EventTimestamp: evt.EventTimestamp,
+		Item: slack.ReactionItem{
+			Type:      evt.Item.Type,
+			Channel:   evt.Item.Channel,
+			Timestamp: evt.Item.Timestamp,
+		},
 	}
 
 	return &react
