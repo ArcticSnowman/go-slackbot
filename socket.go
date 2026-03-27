@@ -174,7 +174,7 @@ func (b *Bot) ConvertMessageEvent(evt *slackevents.MessageEvent) *slack.MessageE
 			BotID:    evt.BotID,
 			Username: evt.Username,
 			Icons:    (*slack.Icon)(evt.Icons),
-			Upload:   evt.Upload,
+			// Upload:   evt.Upload,
 			// Files:    evt.Files,
 
 		},
